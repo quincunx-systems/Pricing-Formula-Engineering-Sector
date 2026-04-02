@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>B&W · Capital & Margin Calculator</title>
+  <style>
+    /* ------------------------------
+      BLACK & WHITE ONLY THEME
+      strict #000 / #fff / transparent
+    --------------------------------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #ffffff;
+      font-family: 'Courier New', 'SF Mono', 'IBM Plex Mono', monospace;
+      color: #000000;
+      line-height: 1.45;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    /* main container – sharp borders */
+    .calculator {
+      max-width: 800px;
+      width: 100%;
+      background: #ffffff;
+      border: 3px solid #000000;
+      padding: 1.8rem 2rem 2.2rem;
+      margin: 1rem auto;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      border-bottom: 3px solid #000000;
+      display: inline-block;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.25rem;
+    }
+
+    .equation {
+      background: #ffffff;
+      border: 2px solid #000000;
+      padding: 1rem;
+      margin: 1.25rem 0 1.8rem 0;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .equation p {
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .variables {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 1.2rem;
+      margin: 1.8rem 0 1.8rem;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      border: none;
+      border-bottom: 1px solid #000000;
+      padding-bottom: 0.5rem;
+    }
+
+    .input-group label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.35rem;
+    }
+
+    .input-group input {
+      background: #ffffff;
+      border: 1px solid #000000;
+      padding: 0.6rem 0.5rem;
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #000000;
+      outline: none;
+      border-radius: 0px;
+    }
+
+    .input-group input:focus {
+      border: 2px solid #000000;
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    .action-btn {
+      background: #000000;
+      border: 2px solid #000000;
+      color: #ffffff;
+      font-family: monospace;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: 0.1s linear;
+      width: 100%;
+      margin: 0.5rem 0 1rem;
+    }
+
+    .action-btn:hover {
+      background: #ffffff;
+      color: #000000;
+    }
+
+    .result-area {
+      margin: 1.8rem 0 1rem;
+      border-top: 2px solid #000000;
+      border-bottom: 2px solid #000000;
+      padding: 1.2rem 0;
+      text-align: center;
+    }
+
+    .result-label {
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .result-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      word-break: break-word;
+      font-family: monospace;
+      margin-top: 0.5rem;
+    }
+
+    /* ----- REFERENCE SECTION (bottom details) ----- */
+    .reference-guide {
+      margin-top: 2rem;
+      border-top: 2px solid #000000;
+      padding-top: 1.5rem;
+    }
+
+    .guide-block {
+      margin-bottom: 2rem;
+    }
+
+    .guide-title {
+      font-weight: 800;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-left: 4px solid #000000;
+      padding-left: 0.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .case-table {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin: 1rem 0 1rem 1rem;
+    }
+
+    .case-item {
+      display: flex;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #000000;
+      padding-bottom: 0.5rem;
+    }
+
+    .case-range {
+      font-weight: 700;
+      min-width: 140px;
+      font-family: monospace;
+    }
+
+    .case-desc {
+      font-style: normal;
+    }
+
+    .hard-rule {
+      background: #ffffff;
+      border: 2px solid #000000;
+      padding: 0.8rem 1rem;
+      margin: 1rem 0;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .formula-block {
+      font-family: monospace;
+      background: #ffffff;
+      border: 1px solid #000000;
+      padding: 0.8rem;
+      margin: 0.8rem 0;
+    }
+
+    .inline-code {
+      font-weight: 700;
+      background: #ffffff;
+      border: 1px solid #000000;
+      padding: 0.1rem 0.3rem;
+      font-size: 0.85rem;
+    }
+
+    hr {
+      border-top: 1px solid #000000;
+      margin: 1rem 0;
+    }
+
+    .footnote {
+      font-size: 0.7rem;
+      text-align: center;
+      border-top: 1px solid #000000;
+      padding-top: 1rem;
+      margin-top: 1rem;
+    }
+
+    /* corner nav */
+    .corner-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      pointer-events: none;
+      z-index: 100;
+      padding: 1rem 1.5rem;
+    }
+
+    .nav-left, .nav-right {
+      pointer-events: auto;
+      position: absolute;
+      top: 1rem;
+    }
+
+    .nav-left {
+      left: 1rem;
+    }
+    .nav-right {
+      right: 1rem;
+    }
+
+    .corner-nav a {
+      background: #ffffff;
+      border: 2px solid #000000;
+      color: #000000;
+      text-decoration: none;
+      font-family: monospace;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.4rem 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-block;
+    }
+
+    .corner-nav a:hover {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    @media (max-width: 600px) {
+      .calculator {
+        padding: 1.2rem;
+      }
+      .result-value {
+        font-size: 1.7rem;
+      }
+      .case-range {
+        min-width: 110px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- top corners: log navigation (B&W) -->
+<div class="corner-nav">
+  <div class="nav-left">
+    <a href="#" id="logLinkLeft"> LOG</a>
+  </div>
+  <div class="nav-right">
+    <a href="#" id="logLinkRight"> LOGIN</a>
+  </div>
+</div>
+
+<main class="calculator">
+  <h1>COST · CAPITAL · MARGIN</h1>
+  
+  <div class="equation">
+    <p>
+      SP = ( C<sub>p</sub> + C<sub>s</sub> + C<sub>d</sub> + C<sub>o</sub> ) × (1 + r · T/12) × (1 + M)
+    </p>
+  </div>
+
+  <form id="calcForm">
+    <div class="variables">
+      <div class="input-group">
+        <label>C<sub>p</sub> — Purchase cost ($)</label>
+        <input type="number" id="purchaseCost" step="any" value="">
+      </div>
+      <div class="input-group">
+        <label>C<sub>s</sub> — Shipping cost ($)</label>
+        <input type="number" id="shippingCost" step="any" value="">
+      </div>
+      <div class="input-group">
+        <label>C<sub>d</sub> — Duty / taxes ($)</label>
+        <input type="number" id="dutyCost" step="any" value="">
+      </div>
+      <div class="input-group">
+        <label>C<sub>o</sub> — Other costs ($)</label>
+        <input type="number" id="otherCost" step="any" value="">
+      </div>
+      <div class="input-group">
+        <label>r — Annual rate (cost of capital)</label>
+        <input type="number" id="annualRate" step="any" value="">
+      </div>
+      <div class="input-group">
+        <label>T — Time in months</label>
+        <input type="number" id="timeMonths" step="any" value="">
+      </div>
+      <div class="input-group">
+        <label>M — Profit margin (decimal)</label>
+        <input type="number" id="profitMargin" step="any" value="2.00">
+      </div>
+    </div>
+    
+    <button type="button" class="action-btn" id="calculateBtn">⟡ CALCULATE SP ⟡</button>
+  </form>
+
+  <div class="result-area">
+    <div class="result-label">SELLING PRICE (SP)</div>
+    <div class="result-value" id="spValue">— $0.00 —</div>
+  </div>
+
+  <!-- ========== ADDED REFERENCE SECTION (bottom details) ========== -->
+  <div class="reference-guide">
+    
+    <!-- M (Profit margin) guidelines -->
+    <div class="guide-block">
+      <div class="guide-title">▸ PROFIT MARGIN (M) — reference ranges</div>
+      <div class="case-table">
+        <div class="case-item">
+          <span class="case-range">0.15 – 0.25</span>
+          <span class="case-desc">commodity / high competition</span>
+        </div>
+        <div class="case-item">
+          <span class="case-range">0.25 – 0.40</span>
+          <span class="case-desc">standard engineering goods</span>
+        </div>
+        <div class="case-item">
+          <span class="case-range">0.40 – 0.80</span>
+          <span class="case-desc">specialized / low competition</span>
+        </div>
+        
+<div class="case-item">
+  <span class="case-range">&gt; 0.80</span>
+  <span class="case-desc">dominant position / scarcity / high control</span>
+</div>
+      </div>
+      <div class="hard-rule">
+        **RULE — If import + sales cycle is long or risky → <strong>do not go below 0.35</strong><br>
+        **If it’s niche tooling or custom → <strong>target 0.50+</strong><br>
+         **Anything lower than ~25% in engineering imports is usually weak unless you move volume.
+      </div>
+    </div>
+
+    <!-- r (Cost of capital) guidelines -->
+    <div class="guide-block">
+      <div class="guide-title">▸ CAPITAL RATE (r) — cost of capital structure</div>
+      <div class="formula-block">
+        <strong>r = r<sub>f</sub> + r<sub>infl</sub> + r<sub>risk</sub> + r<sub>opportunity</sub></strong><br>
+        <span style="font-size:0.8rem;">r<sub>f</sub> = base rate (bank / safe return) &nbsp;|&nbsp; 
+        r<sub>infl</sub> = inflation protection &nbsp;|&nbsp; 
+        r<sub>risk</sub> = business risk (delays, defaults, currency)<br>
+        r<sub>opportunity</sub> = what else your money could earn</span>
+      </div>
+      <div class="case-table">
+        <div class="case-item">
+          <span class="case-range">0.12 – 0.18</span>
+          <span class="case-desc">Low risk, fast turnover</span>
+        </div>
+        <div class="case-item">
+          <span class="case-range">0.18 – 0.28</span>
+          <span class="case-desc">Normal engineering imports</span>
+        </div>
+        <div class="case-item">
+          <span class="case-range">0.28 – 0.40+</span>
+          <span class="case-desc">High risk / long delays / currency exposure</span>
+        </div>
+      </div>
+      <div class="hard-rule">
+        **RULE — If your cash is tied up for months in imports → use at least <strong>0.30 (30%)</strong>.<br>
+        Anything lower = you’re underpricing your time and risk.
+      </div>
+    </div>
+    <div class="footnote">
+      Use these ranges as decision data — adjust inputs above to match your real scenario.
+    </div>
+  </div>
+  <!-- end reference section -->
+  
+</main>
+
+<script>
+  (function() {
+    // DOM elements
+    const purchaseInput = document.getElementById('purchaseCost');
+    const shippingInput = document.getElementById('shippingCost');
+    const dutyInput = document.getElementById('dutyCost');
+    const otherInput = document.getElementById('otherCost');
+    const rateInput = document.getElementById('annualRate');
+    const monthsInput = document.getElementById('timeMonths');
+    const marginInput = document.getElementById('profitMargin');
+    const calculateBtn = document.getElementById('calculateBtn');
+    const spDisplay = document.getElementById('spValue');
+
+    function parseNumber(value, defaultValue = 0) {
+      if (value === undefined || value === null) return defaultValue;
+      const trimmed = value.trim();
+      if (trimmed === "") return defaultValue;
+      const parsed = parseFloat(trimmed);
+      return isNaN(parsed) ? defaultValue : parsed;
+    }
+
+    function computeSP() {
+      const Cp = parseNumber(purchaseInput.value, 0);
+      const Cs = parseNumber(shippingInput.value, 0);
+      const Cd = parseNumber(dutyInput.value, 0);
+      const Co = parseNumber(otherInput.value, 0);
+      const r = parseNumber(rateInput.value, 0);
+      const T = parseNumber(monthsInput.value, 0);
+      const M = parseNumber(marginInput.value, 0);
+
+      const totalBaseCost = Cp + Cs + Cd + Co;
+      const capitalFactor = 1 + r * (T / 12);
+      const marginFactor = 1 + M;
+      let sellingPrice = totalBaseCost * capitalFactor * marginFactor;
+      sellingPrice = Math.round(sellingPrice * 100) / 100;
+      return sellingPrice;
+    }
+
+    function updateResult() {
+      let sp = computeSP();
+      let formatted = (isNaN(sp) || !isFinite(sp)) ? '— ERROR —' : `$ ${sp.toFixed(2)}`;
+      spDisplay.innerText = formatted;
+    }
+
+    calculateBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      updateResult();
+    });
+
+    const allInputs = [
+      purchaseInput, shippingInput, dutyInput, otherInput,
+      rateInput, monthsInput, marginInput
+    ];
+    allInputs.forEach(input => {
+      if (input) {
+        input.addEventListener('input', updateResult);
+        input.addEventListener('change', updateResult);
+      }
+    });
+
+    updateResult();
+
+    // ---- top corner navigation: demo log actions ----
+    const leftLog = document.getElementById('logLinkLeft');
+    const rightLogin = document.getElementById('logLinkRight');
+    
+    function showCornerMessage(msg, side) {
+      const existing = document.querySelector('.temp-corner-msg');
+      if (existing) existing.remove();
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'temp-corner-msg';
+      msgDiv.textContent = msg;
+      msgDiv.style.position = 'fixed';
+      msgDiv.style.top = '4rem';
+      msgDiv.style.backgroundColor = '#ffffff';
+      msgDiv.style.border = '2px solid #000000';
+      msgDiv.style.padding = '0.5rem 1rem';
+      msgDiv.style.fontFamily = 'monospace';
+      msgDiv.style.fontSize = '0.75rem';
+      msgDiv.style.fontWeight = 'bold';
+      msgDiv.style.zIndex = '200';
+      msgDiv.style.maxWidth = '280px';
+      msgDiv.style.color = '#000000';
+      if (side === 'left') {
+        msgDiv.style.left = '1rem';
+      } else {
+        msgDiv.style.right = '1rem';
+      }
+      document.body.appendChild(msgDiv);
+      setTimeout(() => { if (msgDiv.remove) msgDiv.remove(); }, 2000);
+    }
+
+    if (leftLog) {
+      leftLog.addEventListener('click', (e) => {
+        e.preventDefault();
+        showCornerMessage(`📋 LOG: reference accessed — M & r guidelines shown at bottom`, 'left');
+      });
+    }
+    if (rightLogin) {
+      rightLogin.addEventListener('click', (e) => {
+        e.preventDefault();
+        showCornerMessage(`🔐 LOGIN simulation — use M and r ranges as input data`, 'right');
+      });
+    }
+  })();
+</script>
+</body>
+        </html>
